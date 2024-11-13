@@ -1,0 +1,39 @@
+# Write a python program to implement k-means algorithm on a Diabetes dataset.
+
+# Load the diabetes dataset
+diabetes_data = pd.read_csv("diabetes.csv")
+
+# Preprocessing: Remove the 'Outcome' column and handle missing values
+X = diabetes_data.drop(columns=['Outcome']).dropna()
+
+# Standardize the data
+scaler = StandardScaler()
+scaled_X = scaler.fit_transform(X)
+
+# Determine the optimal number of clusters using the elbow method
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, random_state=42)
+    kmeans.fit(scaled_X)
+    wcss.append(kmeans.inertia_)
+
+# Plot the elbow method graph
+plt.plot(range(1, 11), wcss)
+plt.title('Elbow Method')
+plt.xlabel('Number of Clusters')
+plt.ylabel('WCSS')
+plt.show()
+
+
+# Based on the elbow method, choose an appropriate number of clusters (e.g., k=2)
+optimal_k = 2  # Example: set k to 2
+
+# Apply k-means clustering with the chosen number of clusters
+kmeans = KMeans(n_clusters=optimal_k, random_state=42)
+clusters = kmeans.fit_predict(scaled_X)
+
+# Add the cluster labels to the original dataset
+diabetes_data['Cluster'] = clusters
+
+# Print the cluster assignments for each data point
+print(diabetes_data[['Cluster']])
